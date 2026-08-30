@@ -861,7 +861,7 @@ def render_tocs(site, pages, files, md):
                     elif name == tc['num_column'].lower():
                         tds.append(f'<td class="num">{esc(cell)}</td>')
                     else:
-                        tds.append(f'<td>{esc(cell)}</td>')
+                        tds.append(f'<td>{md.inline(cell) if cell else ""}</td>')
                 if 'skip' in flags.split(): has_skip = True
                 rows.append(f'<tr id="{rid}" data-flags="{esc(flags)}" data-ing="{"y" if summary else "n"}">{"".join(tds)}</tr>')
                 meta = [col(c, m) for m in tc['meta_columns']] or [fcell, flags]
