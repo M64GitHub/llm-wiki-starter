@@ -1,0 +1,50 @@
+{
+  "name": "Chiptune Wiki",
+  "mark": "CHIPTUNE WIKI",
+  "tagline": "How to make chip music and understand it — SID, Game Boy and PC trackers: techniques, tools, theory in tracker terms, formats, history, people. An LLM wiki: sources in, cross-linked pages out.",
+  "search_placeholder": "search pages, cheat sheets, TraxWeekly articles…",
+  "search_help": "hex and tracker notation search as typed (<code>$0E</code>, <code>Gxx</code>, <code>C-4</code>)",
+  "types": [
+    {"id": "technique", "folder": "techniques", "label": "Techniques", "color": "cyan",
+     "description": "how-to pages: one technique per page, a ### section per tool"},
+    {"id": "concept", "folder": "concepts", "label": "Concepts", "color": "amber",
+     "description": "theory, terminology, history, workflow, aesthetics"},
+    {"id": "entity", "folder": "entities", "label": "Entities", "color": "pink",
+     "description": "people, groups, tools, chips, platforms, formats, songs, publications, events",
+     "kinds": [
+       {"id": "tool", "label": "Tools"}, {"id": "chip", "label": "Chips"}, {"id": "platform", "label": "Platforms"},
+       {"id": "format", "label": "Formats"}, {"id": "person", "label": "People"}, {"id": "group", "label": "Groups"},
+       {"id": "event", "label": "Events"}, {"id": "publication", "label": "Publications"}, {"id": "song", "label": "Songs"}]},
+    {"id": "summary", "folder": "summaries", "label": "Summaries", "color": "green", "prefix": "s-",
+     "description": "one page per ingested source or article"}
+  ],
+  "facets": [
+    {"key": "platforms", "label": "Platforms",
+     "values": {"c64": "C64 / SID", "gameboy": "Game Boy", "pc-tracker": "PC trackers", "nes": "NES", "amiga": "Amiga", "general": "General"}}
+  ],
+  "cheatsheets": {
+    "type": "entity", "kind": "tool", "heading": "cheat sheet", "section_type": "technique",
+    "skip_headings": ["related", "sources", "to verify", "community knowledge"],
+    "skip_prefixes": ["features", "techniques with", "newer versions", "tips from"],
+    "generic": {"slug": "generic-trackers", "title": "Generic / PC trackers", "match": "tracker"},
+    "description": "The tables from every tool page plus the per-tool ### sections of every technique page, collected by tool. Pick a tool, or open the standalone version to print it."
+  },
+  "tocs": [
+    {"file": "inbox/traxweekly-toc.md", "id": "tw", "title": "TraxWeekly — table of contents", "nav": "TraxWeekly", "label": "TW article",
+     "collection": "traxweekly", "file_column": "issue", "num_column": "#", "title_column": "title",
+     "flags_column": "flags", "summary_column": "summary", "star": "★",
+     "meta_columns": ["issue", "date", "author", "flags"],
+     "filters": [{"flag": "★", "label": "★ know-how"}, "interview", "review", "compo", "column", "letter"],
+     "facets": {"platforms": ["pc-tracker"]}}
+  ],
+  "raw_collections": {
+    "traxweekly": {
+      "name_pattern": "TRAXWEEK\\.(\\w+)", "title": "TraxWeekly #{n}",
+      "dates_file": "archive-index.txt",
+      "dates_pattern": "(TRAXWEEK\\.\\w+|TW\\.\\d+|TW-ART\\d\\.TXT)\\s*\\([\\d.]+ kB\\)\\s*([^\\n]+)",
+      "article_pattern": "^\\s*/?-{1,3}\\s*\\[\\s*(?:(?P<num>\\d+)[.)]\\s*)?(?P<title>[^\\]]+?)\\s*\\]",
+      "skip_until": "\\[\\s*contents\\s*\\]"
+    }
+  },
+  "stub_words": 180
+}

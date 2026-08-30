@@ -1,0 +1,25 @@
+{
+  "name": "{{WIKI_NAME}}",
+  "mark": "",
+  "tagline": "",
+  "search_placeholder": "",
+  "search_help": "",
+  "types": [
+    {"id": "technique", "folder": "techniques", "label": "Techniques", "color": "cyan",
+     "description": "how-to pages: one technique or procedure per page, with a ### section per tool or context"},
+    {"id": "concept", "folder": "concepts", "label": "Concepts", "color": "amber",
+     "description": "theory, terminology, history, workflow, aesthetics — what things are and why"},
+    {"id": "entity", "folder": "entities", "label": "Entities", "color": "pink",
+     "description": "the nouns of the field: people, groups, tools, formats, events, publications …",
+     "kinds": [
+       {"id": "tool", "label": "Tools"}, {"id": "person", "label": "People"}, {"id": "group", "label": "Groups"},
+       {"id": "format", "label": "Formats"}, {"id": "publication", "label": "Publications"}, {"id": "event", "label": "Events"}]},
+    {"id": "summary", "folder": "summaries", "label": "Summaries", "color": "green", "prefix": "s-",
+     "description": "one page per ingested source or article: the citation anchor for every claim"}
+  ],
+  "facets": [],
+  "cheatsheets": null,
+  "tocs": [],
+  "raw_collections": {},
+  "stub_words": 180
+}
