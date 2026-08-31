@@ -43,6 +43,7 @@ llm-wiki-starter/
     tools/site-assets/       stylesheet + search/graph scripts (the shared look and feel)
     tools/lint.py            broken links, orphans, frontmatter, index coverage, unverified count
     tools/pdf-to-text.swift, html-to-text.py, extract-forum-posts.py, add-section.py   ingest helpers
+    tools/fetch-docs.py      mirror a documentation site into raw/, driven by its llms.txt
   tools/
     update-tools.sh    push template tools into an existing wiki (never touches its pages or config)
     selftest.sh        create a throwaway wiki, lint + build it; build the reference wiki through the template

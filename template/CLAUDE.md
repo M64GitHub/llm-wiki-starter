@@ -29,7 +29,8 @@ user about topic, scope, page model and sources, then rewrites this rulebook,
     sources.md       manifest: origin URL/path, date fetched, license notes
   inbox/             triage tables, scout results, plans, quick captures — not wiki
   tools/             build-site.py (viewer), lint.py, pdf-to-text.swift, html-to-text.py,
-                     extract-forum-posts.py, add-section.py (ripple helper)
+                     extract-forum-posts.py, fetch-docs.py (a doc site via its llms.txt),
+                     add-section.py (ripple helper)
   wiki/
     index.md         catalog of every page, grouped. Read it first on any query.
     log.md           append-only operation log
@@ -115,7 +116,10 @@ Notable quotes (short) · Relevance to the wiki · Pages touched.
 ## Operation: ingest <source>
 
 1. If it is a URL, fetch it and save the full text under `raw/<collection>/`
-   verbatim; record it in `raw/sources.md` (URL, date fetched, notes). If it is
+   verbatim; record it in `raw/sources.md` (URL, date fetched, notes). A whole
+   documentation site that publishes `llms.txt` comes in with
+   `tools/fetch-docs.py <base-url> [prefix …]` — it mirrors the pages listed
+   there into `raw/`, which is a *download*, not an ingest. If it is
    a local file, copy it into `raw/` the same way (PDF → text with
    `swift tools/pdf-to-text.swift in.pdf out.txt`; web pages → text with
    `tools/html-to-text.py` (forum threads: `tools/extract-forum-posts.py`); keep
