@@ -47,6 +47,13 @@ Must pass before a commit that touches `template/tools/`.
 - The viewer's look and feel (`template/tools/site-assets/`) is shared by all wikis; per-type
   colours come from `wiki.json` (`assets/types.css` is generated). Change the stylesheet here,
   never in a wiki.
+- `site-assets/style.css` is structure only and must not hardcode a colour, font or radius: every
+  value is a `var()` that a theme in `site-assets/themes/` defines (its header lists the tokens a
+  theme owes it). A wiki picks one with `"style"` in `wiki.json`; the build copies just that file
+  to `assets/theme.css`. A theme whose `light` flag is set in `THEMES` (build-site.py) gets the
+  header's light/dark/auto switch, so it must define both palettes under `:root` and
+  `:root[data-theme=dark]` — never a bare `prefers-color-scheme` block, since "auto" is resolved
+  to a concrete `data-theme` in JS before first paint.
 - `docs/wiki-json.md` documents every config key; update it when `load_config()` in
   `template/tools/build-site.py` changes. `docs/repo-layout.md` holds the file tree — update it
   when files move; `README.md` only points at it. The conceptual pitch lives in

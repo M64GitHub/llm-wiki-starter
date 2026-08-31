@@ -8,6 +8,7 @@ writes it; edit it by hand whenever the page model grows.
 {
   "name": "Chiptune Wiki",              // site title; <title> suffix, hero heading
   "mark": "CHIPTUNE WIKI",              // logo text in the top bar (default: name in capitals)
+  "style": "tracker",                   // visual theme: "tracker" (default) or "docs" — see below
   "tagline": "How to make chip music …",   // hero paragraph on the home page (optional)
   "search_placeholder": "search pages, cheat sheets, TraxWeekly articles…",   // optional, generated otherwise
   "search_help": "hex and tracker notation search as typed (<code>$0E</code>)", // extra HTML in the search help line
@@ -70,3 +71,15 @@ Notes
 - `raw_collections` is optional; without it a raw file is shown with its file name and no article
   anchors. Patterns are Python regexes (escape backslashes in JSON).
 - Reference example: `reference/chiptune-wiki/wiki.json`.
+
+Themes (`style`)
+
+| value | look | light/dark |
+|---|---|---|
+| `tracker` (default) | the original dark viewer: mono everywhere, neon accents on near-black navy | dark only |
+| `docs` | a clean professional documentation look: sans prose, mono kept for code and config keys, neutral greys with one accent, page-type colour reduced to badges and a tile edge | both, with a switch in the header (auto / light / dark, remembered per browser) |
+
+The files live in `tools/site-assets/themes/`; the build copies the chosen one to
+`assets/theme.css`. Per-type colours are emitted per mode, so a `"color": "amber"` type is a
+readable ochre on white and a soft gold on black. To add a theme, drop a file next to those two,
+define every token `style.css` lists at its top, and register it in `THEMES` in `build-site.py`.
