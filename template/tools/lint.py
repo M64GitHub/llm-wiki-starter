@@ -12,9 +12,12 @@ naming different sets) and **unlanded ripples** (a summary's "## Pages touched" 
 The last two both work the same way: the wiki states its intentions twice, so the two statements can be diffed.
 Citation drift is a defect and counts towards --strict. Unlanded ripples are a *review* list, not a defect list —
 "pages touched" sometimes means "relevant to" rather than "edited" — so they never fail the build; work them
-top-down, one page per sitting. Contradictions and staleness are the maintainer's half — read for them.
+top-down, one page per sitting. Contradictions are the maintainer's half — read for them.
+
+If the wiki has a `tools/check-staleness.py` (optional and wiki-specific: it knows which authority a page's
+`verified-against` names), lint runs it with `--quiet` and prints its summary. Always a warning, never an error.
 """
-import re, os, glob, sys, json, collections
+import re, os, glob, sys, json, collections, subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WIKI = os.path.join(ROOT, 'wiki')
 cfg = {}
@@ -129,6 +132,21 @@ if unlanded:
     print('  (review, not a defect list: "pages touched" sometimes means "relevant to" rather than "edited".)')
 for target in sorted(unlanded, key=lambda t: (-len(unlanded[t]), t)):
     print(f'  {os.path.basename(os.path.dirname(pages[target]))}/{target}: ' + ', '.join(sorted(unlanded[target])))
+
+# Staleness is a *warning*, never an error: `tools/check-staleness.py` is optional and wiki-specific
+# (it knows which authority a page's `verified-against` names). If it is not there, lint is unchanged.
+# A subprocess, so the wiki's tool can be any script (no `main()` contract, no sys.argv juggling) and
+# neither its exit code nor an argparse error can ever fail the lint.
+stale_tool = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'check-staleness.py')
+if os.path.exists(stale_tool):
+    try:
+        r = subprocess.run([sys.executable, stale_tool, '--quiet'], capture_output=True, text=True)
+        out = (r.stdout + r.stderr).rstrip()
+        print(out or f'staleness: not checked (no output, exit {r.returncode})')
+        if not r.returncode:
+            print('  (run `python3 tools/check-staleness.py` for the table -- and after every release it tracks)')
+    except Exception as e:
+        print(f'staleness: not checked ({e})')
 
 if strict and (fm_issues or real_broken or missing_from_index or drift):
     sys.exit(1)

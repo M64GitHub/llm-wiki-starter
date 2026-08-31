@@ -85,6 +85,15 @@ lint_out="$(cd "$tmp" && python3 tools/lint.py --strict)" || { echo "$lint_out";
 echo "$lint_out"
 grep -q 'citation drift: 0 pages' <<<"$lint_out" || { echo "FAIL: citation drift should be 0 on the fixture"; exit 1; }
 grep -q 'unlanded ripples: 1 across 1' <<<"$lint_out" || { echo "FAIL: the unlanded-ripple fixture was not detected"; exit 1; }
+# the optional staleness hook: a wiki-specific tool that rejects --quiet and exits non-zero must
+# still be a warning — lint --strict may not inherit its exit code
+cat > "$tmp/tools/check-staleness.py" <<'STALE'
+import sys
+print('staleness: 2 behind'); sys.exit(3)
+STALE
+stale_out="$(cd "$tmp" && python3 tools/lint.py --strict)" || { echo "$stale_out"; echo "FAIL: check-staleness.py exit code leaked into lint --strict"; exit 1; }
+grep -q 'staleness: 2 behind' <<<"$stale_out" || { echo "FAIL: staleness summary not printed"; exit 1; }
+rm "$tmp/tools/check-staleness.py"
 echo "== build"; (cd "$tmp" && python3 tools/build-site.py --out "$tmp/site" | tail -1)
 for f in index.html wiki/test-technique.html wiki/s-test-source.html wanted/missing-page.html graph.html browse.html health.html sources.html search-index.js assets/types.css; do
   [ -f "$tmp/site/$f" ] || { echo "FAIL: missing site/$f"; exit 1; }
