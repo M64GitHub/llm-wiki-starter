@@ -72,6 +72,38 @@ viewer. What held up, what we changed, and what a kickoff for the next topic sho
    list the big collections that need triage scripts.
 8. **Habits** — commit policy, rebuild policy, language.
 
+## The second lesson: consolidation (2026-08-31, at 676 pages)
+
+Everything above is about getting material *in*. A day and 200 pages later the wiki had the
+opposite problem, and the fix generalises better than anything in the ingest half.
+
+- **Measure the layers before deciding what to do next.** 363 summaries against 61
+  technique+concept pages — six inputs per page a reader actually opens. That ratio was the
+  whole diagnosis, and it is one `ls | wc -l` per folder. The thinnest reader pages turned out
+  to sit on the *best*-sourced topics.
+- **Anywhere the wiki states the same fact twice, or states an intention, is a lint check
+  waiting to be written.** Two came out of this and are now in `template/tools/lint.py`:
+  **unlanded ripples** (a summary lists a page under `## Pages touched`; that page never cites
+  the summary — the ingest stopped at the summary layer) and **citation drift** (`sources:` in
+  the frontmatter and the `## Sources` section naming different sets). The first found 462
+  claims across 133 pages and has driven six working sessions; the second found 35 pages the
+  day it was written. Look for the redundancy in your own conventions and diff the halves.
+- **A metric must not count its own reporting.** The unverified-marker count included `log.md`
+  and `index.md` — files that *discuss* the markers — so every write-up about reducing it
+  raised the number. Exclude the bookkeeping pages, or the metric is noise. (Fixed in the
+  template.)
+- **The list is a review list, not a defect list.** "Pages touched" sometimes means "relevant
+  to". The rule that keeps the metric honest: decide *per summary* whether it is material or
+  merely relevant, and for merely-relevant ones write one honest pointer sentence naming the
+  page where the material really lives. Never manufacture a section to absorb a citation.
+- **One page per sitting, top-down by count, and report before/after numbers every time.** Six
+  sessions took it from 462 to 170. The numbers in the log are what let a fresh session pick it
+  up without re-deriving the state.
+- Six recurring shapes, now a checklist in the `consolidate` operation: a whole tool missing
+  from a concept page; a forward reference never landed; primary research not reaching the
+  reader page; a page with no *earliest* entry; a tool's changelog being a source about the
+  technique; a tool page with its fans but not the reason people left it.
+
 ## Pitfalls
 
 - Shell cwd drift once created a stray `wiki/raw/` tree: anchor writes to absolute paths.

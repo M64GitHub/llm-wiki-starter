@@ -177,9 +177,75 @@ and `## To verify` sections that a raw source could now confirm, frontmatter
 that violates the schema, duplicate pages under different slugs.
 
 Start with `python3 tools/lint.py` (broken links, orphans, frontmatter, index
-coverage, unverified count), then read for contradictions and staleness.
-Report findings. Fix mechanical issues (links, index, frontmatter) directly.
-Ask before rewriting or merging major pages.
+coverage, unverified count, citation drift, unlanded ripples), then read for
+contradictions and staleness. Report findings. Fix mechanical issues (links,
+index, frontmatter, citation drift) directly. Ask before rewriting or merging
+major pages.
+
+Two of the checks work by diffing statements the wiki makes about itself:
+
+- **Citation drift** — a page's `sources:` frontmatter and its `## Sources`
+  section naming different sets. A defect; fix it directly (the section is the
+  full list, so add what is missing to whichever half lacks it).
+- **Unlanded ripples** — a summary lists a page under `## Pages touched`, but
+  that page never cites the summary: the ingest stopped at the summary layer
+  and never reached the reader. A *review* list, not a defect list — see the
+  consolidate operation below.
+
+If your conventions record the same fact in two places, or state an intention
+that can be checked, that is another lint check waiting to be written. Add it.
+
+## Operation: consolidate
+
+The counterweight to ingesting. Ingest adds inputs; consolidate turns inputs
+already in `wiki/summaries/` into the pages a reader actually opens. It needs
+no new sources and touches nothing in `raw/`.
+
+**When**: whenever the source layer has clearly outgrown the reader layer.
+Measure it — count pages per folder and compare `summaries/` with
+`techniques/ + concepts/`. More than a handful of summaries per reader-facing
+page means the ingests have outrun the synthesis.
+
+**What to work on**, in this order:
+
+1. **The unlanded-ripple list from `tools/lint.py`, top-down by count.** One
+   page per sitting; resist breadth.
+2. **The thinnest reader pages on the best-sourced topics** — sort reader pages
+   by size and grep the summaries for each one's terms.
+3. **Reader pages that should exist and do not**, where the material is already
+   spread over many summaries with no page owning it.
+
+**Method for one page** (this is the part a script cannot do):
+
+- `grep -inE '<the page's own terms>' wiki/summaries/<each named summary>.md`
+  rather than reading whole summaries.
+- Decide **per summary: material, or merely relevant?** "Pages touched"
+  sometimes means "relevant to". For merely-relevant ones write a single honest
+  pointer sentence that cites the summary and names the page where the material
+  actually lives.
+- **Never manufacture a section to absorb a citation.** That turns a real metric
+  into a fake one, and it is the only way this operation can do harm.
+- A claim already on the page stays unless a source contradicts it; when two
+  sources disagree, both go on the page.
+- Add every summary used to `sources:` **and** to `## Sources`, and bump
+  `updated:`.
+
+**Shapes worth looking for deliberately** — each one recurred often enough to be
+a checklist:
+
+1. A whole *tool* missing from a concept page although it has summaries.
+2. A forward reference that was never landed ("…the three instruments" — and
+   then they are never described).
+3. Primary research cited on one page but not on the page it is about.
+4. **No earliest entry**: the page's history starts in the middle because the
+   oldest source in the wiki was never harvested onto it.
+5. **A tool's changelog is a source about the technique** — release notes read
+   end to end are the record of a trick becoming a setting.
+6. **A tool page with its fans but not the reason people left it.**
+
+**Finish**: re-run `tools/lint.py` and `tools/build-site.py`, append to
+`wiki/log.md` with the before/after counts, and update the plan file with what
+is still open and in what order. Report the numbers; they should go down.
 
 ## Operation: scout <topic>
 

@@ -22,7 +22,31 @@ updated: 2026-01-01
 
 # Test source
 
-Key claim: the wiki builds. Pages touched: [[test-technique]].
+Key claim: the wiki builds.
+
+## Pages touched
+
+[[test-technique]]
+MD
+# a second summary whose ripple never landed — the unlanded-ripple check must find exactly this one
+cat > "$tmp/wiki/summaries/s-test-unlanded.md" <<'MD'
+---
+title: "Test source, never rippled (summary)"
+type: summary
+source-url: https://example.org/unlanded
+author: Test
+date: 2026-01-01
+created: 2026-01-01
+updated: 2026-01-01
+---
+
+# Test source, never rippled
+
+Key claim: a summary can name a page that does not cite it back.
+
+## Pages touched
+
+[[test-technique]]
 MD
 cat > "$tmp/wiki/techniques/test-technique.md" <<'MD'
 ---
@@ -46,13 +70,21 @@ re-enters the inline renderer, so the placeholder list has to be shared (regress
 | key | value |
 |---|---|
 | `A` | 1 |
+
+## Sources
+
+[[s-test-source]]
 MD
 python3 - "$tmp/wiki/index.md" <<'PY'
 import sys; p=sys.argv[1]; s=open(p).read()
-s=s.replace("## Techniques\n", "## Techniques\n- [[test-technique]] — test\n").replace("## Summaries (one per ingested source)\n", "## Summaries (one per ingested source)\n- [[s-test-source]]\n")
+s=s.replace("## Techniques\n", "## Techniques\n- [[test-technique]] — test\n").replace("## Summaries (one per ingested source)\n", "## Summaries (one per ingested source)\n- [[s-test-source]]\n- [[s-test-unlanded]]\n")
 s=s.replace("ingest a source to fill them:\n", "ingest a source to fill them: [[missing-page]]\n"); open(p,'w').write(s)
 PY
-echo "== lint (empty wiki + test pages)"; (cd "$tmp" && python3 tools/lint.py --strict)
+echo "== lint (empty wiki + test pages)"
+lint_out="$(cd "$tmp" && python3 tools/lint.py --strict)" || { echo "$lint_out"; echo "FAIL: lint --strict"; exit 1; }
+echo "$lint_out"
+grep -q 'citation drift: 0 pages' <<<"$lint_out" || { echo "FAIL: citation drift should be 0 on the fixture"; exit 1; }
+grep -q 'unlanded ripples: 1 across 1' <<<"$lint_out" || { echo "FAIL: the unlanded-ripple fixture was not detected"; exit 1; }
 echo "== build"; (cd "$tmp" && python3 tools/build-site.py --out "$tmp/site" | tail -1)
 for f in index.html wiki/test-technique.html wiki/s-test-source.html wanted/missing-page.html graph.html browse.html health.html sources.html search-index.js assets/types.css; do
   [ -f "$tmp/site/$f" ] || { echo "FAIL: missing site/$f"; exit 1; }

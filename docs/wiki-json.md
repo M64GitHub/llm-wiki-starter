@@ -54,7 +54,11 @@ writes it; edit it by hand whenever the page model grows.
     }
   },
   "stub_words": 180,                    // pages shorter than this count as stubs on the health page
-  "wanted_heading": "## Wanted pages"   // lint: the index section listing intentional red links
+  "wanted_heading": "## Wanted pages",  // lint: the index section listing intentional red links
+  "source_type": "summary",             // lint: the type whose pages are the citation anchors
+  "touched_heading": "## Pages touched",   // lint: where a summary lists the pages it should have rippled into
+  "sources_key": "sources",             // lint: frontmatter key listing a page's summaries
+  "sources_heading": "## Sources"       // lint: the section that should list the same summaries
 }
 ```
 
@@ -83,3 +87,19 @@ The files live in `tools/site-assets/themes/`; the build copies the chosen one t
 `assets/theme.css`. Per-type colours are emitted per mode, so a `"color": "amber"` type is a
 readable ochre on white and a soft gold on black. To add a theme, drop a file next to those two,
 define every token `style.css` lists at its top, and register it in `THEMES` in `build-site.py`.
+
+### Lint keys
+
+Four keys exist only for `tools/lint.py`, and all four have working defaults —
+set them if your wiki names things differently:
+
+| key | default | what it does |
+|---|---|---|
+| `wanted_heading` | `## Wanted pages` | the index section whose `[[links]]` are deliberate red links, excluded from "broken links" |
+| `source_type` | `summary` | the `types` entry whose pages are the citation anchors; its folder is the source layer |
+| `touched_heading` | `## Pages touched` | the section in which a source-layer page lists the pages it should have rippled into. Diffed against reality to give **unlanded ripples** |
+| `sources_key` / `sources_heading` | `sources` / `## Sources` | the two places a page records which summaries it draws on. Diffed against each other to give **citation drift** |
+
+The last two checks exist because the wiki states the same thing twice, or
+states an intention that can be verified. Wherever your own conventions do
+that, the same trick applies — add the check rather than trusting the habit.

@@ -18,7 +18,8 @@ llm-wiki-starter/
     tools/build-site.py      static viewer generator, driven by wiki.json (zero dependencies)
     tools/site-assets/       structural stylesheet + search/graph scripts (the shared look and feel)
     tools/site-assets/themes/  one file per visual theme; wiki.json "style" picks it
-    tools/lint.py            broken links, orphans, frontmatter, index coverage, unverified count
+    tools/lint.py            broken links, orphans, frontmatter, index coverage, unverified count,
+                             citation drift, unlanded ripples
     tools/pdf-to-text.swift, html-to-text.py, extract-forum-posts.py, add-section.py   ingest helpers
     tools/fetch-docs.py      mirror a documentation site into raw/, driven by its llms.txt
   tools/
