@@ -50,6 +50,18 @@ def fm_list(txt, key):
     if m: return [x.strip() for x in re.findall(r'^[ \t]+-[ \t]*(.+?)[ \t]*$', m.group(1), re.M) if x.strip()]
     return None
 
+def section(txt, heading):
+    """The body of a heading's section: the heading alone on its line, up to the next heading of the same or a
+    higher level, or the end of the file. None if the section is absent. Both halves matter -- a plain substring
+    search matches "## Sources and mirrors" before "## Sources", and an unbounded read swallows the sections that
+    follow, so a citation in a later "## To verify" would count as if it were in the list. The configured heading
+    may carry its `#` markers or not (`"## Sources"` and `"Sources"` both work), and any level matches."""
+    m = re.search(r'^(#{1,6})[ \t]*' + re.escape(heading.lstrip('#').strip()) + r'[ \t]*$', txt, re.M)
+    if not m: return None
+    rest = txt[m.end():]
+    nxt = re.search(r'^#{1,%d}[ \t]' % len(m.group(1)), rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
+
 pages = {}
 for f in sorted(glob.glob(WIKI + '/**/*.md', recursive=True)):
     slug = os.path.splitext(os.path.basename(f))[0]
@@ -100,9 +112,10 @@ for slug, f in pages.items():
     txt = read(f)
     listed = fm_list(txt, sources_key)
     if not listed: continue
-    if sources_heading not in txt:
+    sect = section(txt, sources_heading)
+    if sect is None:
         drift[slug] = (sorted(listed), [], True); continue
-    cited = set(link_re.findall(txt.split(sources_heading, 1)[1]))
+    cited = set(link_re.findall(sect))
     missing = sorted(x for x in listed if x not in cited)
     extra = sorted(x for x in cited - set(listed)
                    if x in pages and os.path.basename(os.path.dirname(pages[x])) == source_folder)
@@ -120,9 +133,9 @@ for slug in sorted(drift):
 unlanded = collections.defaultdict(list)
 for slug, f in pages.items():
     if os.path.basename(os.path.dirname(f)) != source_folder: continue
-    m = re.search(re.escape(touched_heading) + r'[ \t]*\n(.*?)(?=\n##\s|\Z)', read(f), re.S)
-    if not m: continue
-    for target in {t.strip() for t in link_re.findall(m.group(1))}:
+    sect = section(read(f), touched_heading)
+    if sect is None: continue
+    for target in {t.strip() for t in link_re.findall(sect)}:
         tf = pages.get(target)
         if not tf or os.path.basename(os.path.dirname(tf)) == source_folder: continue
         if slug not in read(tf): unlanded[target].append(slug)

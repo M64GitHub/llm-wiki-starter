@@ -48,6 +48,25 @@ Key claim: a summary can name a page that does not cite it back.
 
 [[test-technique]]
 MD
+# a summary cited only in the sections *around* the sources list — a lookalike heading before it and a
+# "## To verify" after it. Both checks must read the real section, anchored and bounded: an unanchored
+# substring search matches "## Sources and notes" first, and an unbounded read swallows "## To verify",
+# and either mistake makes this decoy look like an undeclared source.
+cat > "$tmp/wiki/summaries/s-test-nearby.md" <<'MD'
+---
+title: "Test source, cited near the list (summary)"
+type: summary
+source-url: https://example.org/nearby
+author: Test
+date: 2026-01-01
+created: 2026-01-01
+updated: 2026-01-01
+---
+
+# Test source, cited near the list
+
+Key claim: a page may cite a summary outside its sources list.
+MD
 cat > "$tmp/wiki/techniques/test-technique.md" <<'MD'
 ---
 title: Test technique
@@ -71,19 +90,27 @@ re-enters the inline renderer, so the placeholder list has to be shared (regress
 |---|---|
 | `A` | 1 |
 
+## Sources and notes
+
+A heading that merely starts with the sources heading, mentioning [[s-test-nearby]].
+
 ## Sources
 
 [[s-test-source]]
+
+## To verify
+
+A section *after* the sources list, mentioning [[s-test-nearby]] again.
 MD
 python3 - "$tmp/wiki/index.md" <<'PY'
 import sys; p=sys.argv[1]; s=open(p).read()
-s=s.replace("## Techniques\n", "## Techniques\n- [[test-technique]] — test\n").replace("## Summaries (one per ingested source)\n", "## Summaries (one per ingested source)\n- [[s-test-source]]\n- [[s-test-unlanded]]\n")
+s=s.replace("## Techniques\n", "## Techniques\n- [[test-technique]] — test\n").replace("## Summaries (one per ingested source)\n", "## Summaries (one per ingested source)\n- [[s-test-source]]\n- [[s-test-unlanded]]\n- [[s-test-nearby]]\n")
 s=s.replace("ingest a source to fill them:\n", "ingest a source to fill them: [[missing-page]]\n"); open(p,'w').write(s)
 PY
 echo "== lint (empty wiki + test pages)"
 lint_out="$(cd "$tmp" && python3 tools/lint.py --strict)" || { echo "$lint_out"; echo "FAIL: lint --strict"; exit 1; }
 echo "$lint_out"
-grep -q 'citation drift: 0 pages' <<<"$lint_out" || { echo "FAIL: citation drift should be 0 on the fixture"; exit 1; }
+grep -q 'citation drift: 0 pages' <<<"$lint_out" || { echo "FAIL: citation drift should be 0 — the sources section must be anchored (not '## Sources and notes') and bounded (not swallowing '## To verify')"; exit 1; }
 grep -q 'unlanded ripples: 1 across 1' <<<"$lint_out" || { echo "FAIL: the unlanded-ripple fixture was not detected"; exit 1; }
 # the optional staleness hook: a wiki-specific tool that rejects --quiet and exits non-zero must
 # still be a warning — lint --strict may not inherit its exit code
