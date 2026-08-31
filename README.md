@@ -11,19 +11,57 @@ the same way and shares one look and feel, while each has its own page model for
 
 ## Quick start
 
+The whole thing is operated in plain language. Open Claude Code in this repo and say what you
+want — for example:
+
+> **Please let's create a new LLM wiki about space ships**
+
+That is the entire command. The agent proposes a folder (`../space-ships-wiki`), confirms it,
+copies the template, and then — without leaving the session — runs the kickoff interview:
+
+- what the wiki is about and what is explicitly **out** of scope
+- who reads it, and what they want to *do* with it
+- the 2–5 pillars that will structure the index
+- which page types and entity kinds fit *this* topic — it proposes a model, you correct it
+- whether there is one cross-cutting facet (`era`, `agency`, `propulsion` …), and whether cheat
+  sheets make sense
+- how the field writes its values, and what goes stale and needs a date
+- which sources you already have, which canonical ones to ingest first, what to scout
+
+It asks in small batches, offers a default for every question so you can just say "yes", and
+works in your language. Then it rewrites the rulebook, `wiki.json`, README and index for your
+topic, writes a first-ingest plan, lints, builds the viewer, deletes the kickoff file, and hands
+you the page model, the first three sources to ingest and the questions still open.
+
+If you would rather script it, the shell path does the same setup:
+
 ```
-./new-wiki.sh ../ai-models-wiki "AI Models Wiki"   # copy the template, fill the name, git init
-cd ../ai-models-wiki
-claude                                             # first session: finds KICKOFF.md, runs the interview
+./new-wiki.sh ../space-ships-wiki "Space Ships Wiki"   # copy the template, fill the name, git init
+cd ../space-ships-wiki
+claude                                                 # first session finds KICKOFF.md, runs the interview
 ```
 
-Or open Claude Code in *this* repo and say **`new wiki ../ai-models-wiki`** — it runs the script
-and the kickoff interview in one go, so you `cd` into a wiki that is already configured.
+### Then you just talk to it
 
-The kickoff asks about topic, scope, reader, page model (types, kinds, an optional facet),
-notation, known sources and habits; then it rewrites the rulebook, `wiki.json`, README and index
-for your topic, writes a first-ingest plan, lints, builds the viewer and deletes itself. After
-that the next thing you type is `ingest …`.
+`cd` into the new wiki, start Claude Code and speak normally. The operation names in the table
+below are how the rulebook labels things — you never type them literally:
+
+- *"Please scout for new articles covering ion propulsion"* — searches, fetches and skims
+  candidates, writes them to `inbox/` with flags and the pages each would touch. Ingests nothing.
+- *"Which of those are most valuable? Recommend what to ingest first"* — it has read them, so it
+  argues for a shortlist. You decide what enters the wiki.
+- *"Ingest the top three, plus the PDF I put in raw/"* — summaries, then the ripple through
+  every page each source touches.
+- *"That NASA archive is huge — triage it first"* — builds a filterable table of contents, one
+  row per article, so you pick instead of swallowing 900 articles.
+- *"What do we actually know about specific impulse? Cite it"* — answers from the wiki with
+  `[[citations]]`, keeping model knowledge visibly separate.
+- *"This page contradicts that one — check both against the raw sources"* — it follows the
+  citation chain back to the original lines and reports.
+- *"Lint, fix what's mechanical, then build the site and serve it"*
+
+The starter repo itself works the same way: *"update the tools in ../space-ships-wiki"* or
+*"sync the improvements from ../space-ships-wiki back into the template"*.
 
 ## The point: the repo *is* the knowledge
 
@@ -81,7 +119,8 @@ ever ask.
 
 ## The operations
 
-Open Claude Code in a wiki and speak these; they are defined in the wiki's own `CLAUDE.md`.
+These are defined in the wiki's own `CLAUDE.md`, which the agent reads before it does
+anything. The names are labels, not syntax — phrase them however you like.
 
 | operation | what it does |
 |---|---|
