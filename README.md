@@ -1,14 +1,13 @@
 # llm-wiki-starter
 
-Everything needed to start a new **LLM wiki** — Andrej Karpathy's pattern: you curate sources
-and ask questions, Claude Code reads the sources, writes and cross-links the pages, and keeps
-the wiki consistent — so that every wiki we make works the same way, operates with the same
-commands (`ingest`, `triage`, `query`, `lint`, `scout`, `build`) and shares one look and feel,
-while each has its own page model for its own topic.
+Start a new **LLM wiki**: a knowledge base about one topic that an AI agent writes, cross-links
+and maintains for you.
 
-Extracted from a chiptune wiki (476 pages, 300+ raw sources) after its first days. That wiki
-is not public — its raw sources are third-party material — but a snapshot of its non-page files
-is the worked example under `reference/`.
+This is Andrej Karpathy's LLM Wiki pattern, packaged. You curate sources and ask questions;
+Claude Code reads the sources, writes the pages, links them, and keeps the whole thing
+consistent. The repo holds a template, a kickoff interview that bakes your topic into the
+agent's rulebook, a zero-dependency web viewer and a lint pass — so every wiki you make works
+the same way and shares one look and feel, while each has its own page model for its own topic.
 
 ## Quick start
 
@@ -18,14 +17,112 @@ cd ../ai-models-wiki
 claude                                             # first session: finds KICKOFF.md, runs the interview
 ```
 
-Or stay in this repo, open Claude Code here and say **`new wiki ../ai-models-wiki`** — Claude
-runs the script and then the kickoff interview for the new wiki right away, so you can `cd` into
-a wiki that is already configured.
+Or open Claude Code in *this* repo and say **`new wiki ../ai-models-wiki`** — it runs the script
+and the kickoff interview in one go, so you `cd` into a wiki that is already configured.
 
-The kickoff asks about topic, scope, reader, the page model (types, kinds, an optional facet),
+The kickoff asks about topic, scope, reader, page model (types, kinds, an optional facet),
 notation, known sources and habits; then it rewrites the rulebook, `wiki.json`, README and index
-for the topic, writes a first-ingest plan (optionally a scout), lints, builds the viewer and
-removes itself. After that the next command is `ingest …`.
+for your topic, writes a first-ingest plan, lints, builds the viewer and deletes itself. After
+that the next thing you type is `ingest …`.
+
+## The point: the repo *is* the knowledge
+
+The generated site is genuinely good to read — full-text search, backlinks, link graphs, cheat
+sheets. But the site is the surface, not the product. Three things separate this from "a folder
+of notes with a static site generator":
+
+**The content is fully managed by the agent.** You do not hand-write pages. You bring a source;
+the agent summarizes it, decides which existing pages it changes, rewrites those, creates the
+ones that are missing, updates the catalog and logs what it did. Your job is curation and
+questions — what enters the wiki, and what you want to know.
+
+**Opening an agent in the repo gives it the whole topic.** `CLAUDE.md` is a rulebook the agent
+reads before every operation: the focus, the page model, the domain's notation, the citation
+rules. `wiki/index.md` is a catalog it reads first on any question. `wiki/log.md` is the
+append-only history of every operation. So a fresh session — or a second one running in
+parallel — starts out knowing the domain's vocabulary, what is already established and what is
+still unverified, without you re-explaining anything. The wiki is the codebase, the agent is the
+programmer, the viewer is just the IDE.
+
+**Raw sources stay in the repo and stay addressable.** Originals live immutable under `raw/`,
+one folder per collection, with a manifest recording origin, fetch date and license. Every claim
+on a page cites a summary page; every summary records the `source-path` it came from. That makes
+an unbroken chain — claim → summary → the exact lines of the original — which both you and the
+agent can walk. When a question needs the primary text rather than the compression (the actual
+register table, a spec's exact wording), the agent opens the raw file and reads it.
+
+Pages are plain Markdown with `[[wikilinks]]` and YAML frontmatter — no Obsidian-only syntax —
+so the same wiki opens in Obsidian, in the built-in viewer, or in anything else you write.
+
+## What it is, and what it isn't
+
+**Not a second brain.** A second brain (PARA, Zettelkasten, a hand-built Obsidian vault) is
+written *by* a human *for* a human's later recall. This flips the division of labor: rather than
+you maintaining a knowledge base and occasionally asking an AI about it, the agent builds and
+maintains the whole thing. Same substrate, same goal of knowledge that accumulates, different
+author. And a second brain is personal by definition, while a topic wiki has nothing to do with
+you — it is about the domain. A second brain is one thing you *could* build with this pattern,
+not what the pattern is.
+
+**Adjacent to a skill, on a different axis.** Skills and wikis rhyme structurally — both are
+progressive-disclosure filesystems where an agent reads a short index first and loads only the
+files it needs. But a skill is *know-how*: procedures, mostly static, human-written. A wiki is
+*know-what*: facts about a domain, compiled from sources, cross-linked, and continuously
+rewritten as new sources land. The strongest combination is a skill that tells an agent how to
+consult and maintain a particular wiki — the librarian's procedures next to the library. A
+static "how to configure X" skill rots; a wiki keeps absorbing the new sizing tables and
+gotchas.
+
+**Not RAG.** RAG retrieves chunks at query time, so the model rediscovers the domain from
+scratch on every question and nothing accumulates. A wiki moves that work to write time —
+knowledge treated the way a compiler treats source code: pre-process once, run fast forever. The
+synthesis, the contradictions found, the cross-links drawn are all done and saved before you
+ever ask.
+
+## The operations
+
+Open Claude Code in a wiki and speak these; they are defined in the wiki's own `CLAUDE.md`.
+
+| operation | what it does |
+|---|---|
+| `ingest <url or path>` | File a source: fetch it verbatim into `raw/`, register it in the manifest, write one summary per *article*, then **ripple** it through the wiki. |
+| `triage <collection>` | For big multi-article sources (newsletters, forum dumps, doc sets): a script builds a filterable table of contents in `inbox/`, one row per article with relevance flags. You pick rows; nothing is ingested behind your back. |
+| `scout <topic>` | Search the web for candidate sources, fetch and skim each, and write 5–10 candidates to `inbox/` with flags and the pages each would touch. Again: no auto-ingest, you choose what enters. |
+| `query <question>` | Answer from the wiki with `[[citations]]`, keeping what the wiki knows separate from what the model adds — and offering to save a good synthesis as a new page. |
+| `lint` | Broken links, orphans, contradictions, stale claims, pages missing from the index, `(unverified)` claims a new source could now confirm, frontmatter violations, duplicate slugs. |
+| `build` | Render the viewer into `site/`; `--serve` also serves it and rebuilds on change. |
+
+**Ripple is where the value is.** It is step 4 of every ingest and the reason this compounds: a
+good source does not produce one summary and stop — it updates 5–15 pages. A tool manual touches
+the tool's page, every technique that tool implements (a new per-tool subsection with the
+concrete steps), the file formats, the author. An interview touches people, groups, tools and
+works. A source that produced a summary and nothing else was ingested wrong.
+
+Two conventions carry a lot of weight. **Wanted pages**: linking `[[to-a-page-that-does-not-exist-yet]]`
+is a TODO, not an error — the viewer gives each wanted slug a page listing who links to it, so
+the red links become the ingest queue. **`(unverified)` markers**: the agent may add general
+knowledge only when marked, collected under a `## To verify` heading — which turns out to be the
+best planning tool there is, because the next sources are chosen to retire those markers.
+
+## The viewer
+
+`python3 tools/build-site.py` renders `wiki/`, the `inbox/` tables and `raw/` into a static site.
+Zero dependencies, Python 3 only; the reference wiki's 654 pages build in about 1.4 s.
+
+- **Search** over every page, heading, cheat sheet and TOC row, with facet filters (`type:`,
+  `kind:`, `tag:` and whatever facet your topic defines) — and an option to search the full text
+  of every raw source, where results deep-link to the line.
+- **Pages** with an on-page TOC, backlinks, a local link graph, highlighted citations and
+  `(unverified)` markers, and red links to wanted pages.
+- **Link graph** for the whole wiki or the neighbourhood of one page; drag, zoom, filter by type.
+- **Cheat sheets** per tool: the tool page's reference tables plus every technique page's
+  section for that tool, with a print stylesheet.
+- **Browse** by type, kind, facet or tag; a **health** page mirroring lint (wanted pages,
+  unverified claims, stubs, orphans, recent changes); **sources** — every raw file as a numbered,
+  line-addressable page, which is what makes the citation chain clickable.
+
+Everything topic-specific — page types and their folders, entity kinds, facets, TOC tables,
+cheat-sheet rules — is data in `wiki.json`, never code. See `docs/wiki-json.md`.
 
 ## What is in here
 
@@ -49,30 +146,36 @@ llm-wiki-starter/
     update-tools.sh    push template tools into an existing wiki (never touches its pages or config)
     selftest.sh        create a throwaway wiki, lint + build it; build the reference wiki through the template
   docs/
-    wiki-json.md       the configuration schema, with the chiptune example
+    wiki-json.md       the configuration schema, with a worked example
   reference/
-    chiptune-wiki/     the chiptune wiki's CLAUDE.md, README, index, sources manifest, wiki.json,
+    chiptune-wiki/     a real wiki's CLAUDE.md, README, index, sources manifest, wiki.json,
                        triage/extract scripts, a scout file and a plan file — a complete worked example
     example-pages/     one real page per type (technique, concept, entity ×2, summary ×2)
-    lessons-learned.md what the chiptune wiki taught us and what to decide at kickoff
+    lessons-learned.md what the first wiki taught us and what to decide at kickoff
 ```
 
-## The viewer
-
-`tools/build-site.py` renders `wiki/`, `inbox/` tables and `raw/` into a static site with search
-(facet filters `type:` `kind:` `tag:` + your facets), backlinks and a local link graph on every
-page, a whole-wiki graph, browse-by-facet pages, wanted (red-link) pages, a health page, every raw
-source as a line-addressable page, optional per-tool cheat sheets and filterable TOC tables. It
-reads everything topic-specific from `wiki.json` — see `docs/wiki-json.md`. A 654-page wiki
-builds through this exact generator with `reference/chiptune-wiki/wiki.json` (that is what
-`tools/selftest.sh` checks when that wiki is present locally), so improvements made here can be
-pushed to every wiki with `tools/update-tools.sh`.
+Extracted from a chiptune wiki (476 pages and 300+ raw sources in its first days, 654 pages now)
+once the pattern had proven itself. That wiki is not public — its raw sources are third-party
+material — but a snapshot of its non-page files is the worked example under `reference/`, and it
+is what `tools/selftest.sh` builds through the template's own generator.
 
 ## Keeping wikis in sync
 
 - Improve the viewer or lint **here**, run `tools/selftest.sh`, then `tools/update-tools.sh <wiki>`
-  for each wiki.
-- If you improve a tool inside a wiki, port it back here (Claude: `sync from <wiki>`), keeping the
-  template topic-neutral.
-- The rulebook text (`template/CLAUDE.md`) is copied, not linked: each wiki's rulebook diverges on
-  purpose after the kickoff. When the generic parts change, apply the change by hand where it matters.
+  for each wiki. Only `tools/` is touched — never a wiki's pages or its config.
+- If you improve a tool inside a wiki, port it back here (Claude: `sync from <wiki>`), keeping
+  the template topic-neutral.
+- The rulebook text (`template/CLAUDE.md`) is copied, not linked: each wiki's rulebook diverges
+  on purpose after the kickoff. When the generic parts change, apply the change where it matters.
+
+## The failure mode to watch
+
+Because the agent compresses sources into pages, one misunderstanding can propagate quietly
+across every page it links. That is the reason `lint` exists as a first-class operation rather
+than a nicety, why every claim is required to cite a summary and every summary to record its raw
+`source-path`, and why unverified model knowledge has to be marked as such. Spot-check generated
+pages against the raw text they came from — the chain is there to make that cheap.
+
+## License
+
+MIT — see `LICENSE`.
