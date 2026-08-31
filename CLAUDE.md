@@ -1,8 +1,8 @@
 # llm-wiki-starter — rules for Claude Code
 
 This repo is the template and toolkit for our LLM wikis (Karpathy's pattern). It is **not** a
-wiki itself. Read `README.md` for the layout. Two jobs happen here: creating new wikis, and
-maintaining the shared template/tools so every wiki works and looks the same.
+wiki itself. Read `docs/repo-layout.md` for the layout. Two jobs happen here: creating new
+wikis, and maintaining the shared template/tools so every wiki works and looks the same.
 
 ## Operation: new wiki <path> [name]
 
@@ -48,7 +48,9 @@ Must pass before a commit that touches `template/tools/`.
   colours come from `wiki.json` (`assets/types.css` is generated). Change the stylesheet here,
   never in a wiki.
 - `docs/wiki-json.md` documents every config key; update it when `load_config()` in
-  `template/tools/build-site.py` changes.
+  `template/tools/build-site.py` changes. `docs/repo-layout.md` holds the file tree — update it
+  when files move; `README.md` only points at it. The conceptual pitch lives in
+  `docs/what-is-an-llm-wiki.md`; keep the README's summary of it short.
 - Keep `reference/` a faithful snapshot of the chiptune wiki's non-page files; refresh it
   deliberately (say so in the commit), don't let it drift.
 
