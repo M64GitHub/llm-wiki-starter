@@ -32,9 +32,10 @@ topic-neutral (no topic words, no hard-coded folders, facets or collections — 
 
 ## Operation: selftest
 
-`tools/selftest.sh`: creates a throwaway wiki, lints and builds it, and builds `../chiptune-wiki`
-through the template generator with `reference/chiptune-wiki/wiki.json`. Must pass before a
-commit that touches `template/tools/`.
+`tools/selftest.sh`: creates a throwaway wiki, lints and builds it, and — if a `../chiptune-wiki`
+sibling is present — builds it through the template generator with
+`reference/chiptune-wiki/wiki.json`; that half is skipped when it is not there (a fresh clone).
+Must pass before a commit that touches `template/tools/`.
 
 ## Maintaining the template
 

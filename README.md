@@ -6,8 +6,9 @@ the wiki consistent — so that every wiki we make works the same way, operates 
 commands (`ingest`, `triage`, `query`, `lint`, `scout`, `build`) and shares one look and feel,
 while each has its own page model for its own topic.
 
-Extracted from the [chiptune wiki](../chiptune-wiki) (476 pages, 300+ raw sources) after its
-first days; that wiki stays the worked example under `reference/`.
+Extracted from a chiptune wiki (476 pages, 300+ raw sources) after its first days. That wiki
+is not public — its raw sources are third-party material — but a snapshot of its non-page files
+is the worked example under `reference/`.
 
 ## Quick start
 
@@ -62,10 +63,10 @@ llm-wiki-starter/
 (facet filters `type:` `kind:` `tag:` + your facets), backlinks and a local link graph on every
 page, a whole-wiki graph, browse-by-facet pages, wanted (red-link) pages, a health page, every raw
 source as a line-addressable page, optional per-tool cheat sheets and filterable TOC tables. It
-reads everything topic-specific from `wiki.json` — see `docs/wiki-json.md`. The chiptune wiki
+reads everything topic-specific from `wiki.json` — see `docs/wiki-json.md`. A 654-page wiki
 builds through this exact generator with `reference/chiptune-wiki/wiki.json` (that is what
-`tools/selftest.sh` checks), so improvements made here can be pushed to every wiki with
-`tools/update-tools.sh`.
+`tools/selftest.sh` checks when that wiki is present locally), so improvements made here can be
+pushed to every wiki with `tools/update-tools.sh`.
 
 ## Keeping wikis in sync
 

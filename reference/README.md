@@ -1,6 +1,6 @@
 # reference/ — the chiptune wiki as a worked example
 
-Snapshot of the non-page files of `../chiptune-wiki` (taken 2026-08-30, 476 pages) plus a few
+Snapshot of the non-page files of the chiptune wiki (taken 2026-08-30, 476 pages) plus a few
 real pages. Use it to see what a finished rulebook, index, sources manifest, scout file and
 plan look like, and how the generic viewer is configured for a specific topic. Nothing here is
 copied into new wikis by `new-wiki.sh`.
