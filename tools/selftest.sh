@@ -40,6 +40,9 @@ updated: 2026-01-01
 
 A page that cites [[s-test-source]] and links a wanted page [[missing-page]] (unverified).
 
+A markdown link whose label holds inline code: [`code-label`](https://example.org/x) — this
+re-enters the inline renderer, so the placeholder list has to be shared (regression guard).
+
 | key | value |
 |---|---|
 | `A` | 1 |
@@ -55,6 +58,8 @@ for f in index.html wiki/test-technique.html wiki/s-test-source.html wanted/miss
   [ -f "$tmp/site/$f" ] || { echo "FAIL: missing site/$f"; exit 1; }
 done
 grep -q 'class="wl wanted"' "$tmp/site/wiki/test-technique.html" || { echo "FAIL: wanted link not rendered"; exit 1; }
+grep -q '<a class="ext" href="https://example.org/x"><code>code-label</code></a>' "$tmp/site/wiki/test-technique.html" \
+  || { echo "FAIL: markdown link with inline-code label not rendered (nested inline placeholder bug)"; exit 1; }
 grep -q 'Selftest Wiki' "$tmp/site/index.html" || { echo "FAIL: site name"; exit 1; }
 echo "ok: template wiki lints and builds"
 ref="$here/../chiptune-wiki"
