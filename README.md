@@ -85,23 +85,8 @@ text rather than the compression, the agent opens the raw file and reads it.
 Pages are plain Markdown with `[[wikilinks]]` and YAML frontmatter — no Obsidian-only syntax —
 so a wiki opens in Obsidian, in the built-in viewer, or in anything else you write.
 
-## What it is, and what it isn't
-
-- **Not a second brain.** A second brain is written by a human for that human's later recall.
-  Here the agent is the author — and a topic wiki is about the domain, not about you.
-- **Adjacent to a skill.** A skill holds *know-how*: procedures, human-written, mostly static. A
-  wiki holds *know-what*: facts compiled from sources and rewritten as new ones land. The
-  strongest combination is both — a skill that tells an agent how to maintain a particular wiki.
-- **Not RAG.** RAG retrieves chunks at query time, rediscovering the domain on every question
-  and keeping nothing. A wiki does the synthesis at write time and saves it: knowledge treated
-  the way a compiler treats source code — pre-process once, run fast forever.
-
-The cost of compiling at write time is that mistakes compile in too — one misunderstanding can
-propagate across every page linking it. That is why `lint` is a first-class operation, why every
-claim cites a summary, and why every summary records the raw lines it came from.
-
-→ **[docs/what-is-an-llm-wiki.md](docs/what-is-an-llm-wiki.md)** — the long version, and the
-four places the design guards against that failure mode.
+→ **[What an LLM wiki is](docs/what-is-an-llm-wiki.md)** — the pattern in full, how it compares
+to a second brain, a skill and RAG, and the failure mode that comes with compiling knowledge.
 
 ## The operations
 
