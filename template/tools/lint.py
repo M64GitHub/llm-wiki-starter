@@ -44,7 +44,7 @@ def fm_list(txt, key):
     """The value of a frontmatter list key, inline (`key: [a, b]`) or block (`key:\n  - a`). None if absent."""
     if not txt.startswith('---\n'): return None
     fm = txt.split('---\n', 2)[1]
-    m = re.search(rf'^{re.escape(key)}:[ \t]*\[(.*?)\][ \t]*$', fm, re.M | re.S)
+    m = re.search(rf'^{re.escape(key)}:[ \t]*\[(.*?)\][ \t]*(?:#.*)?$', fm, re.M | re.S)
     if m: return [x.strip() for x in m.group(1).split(',') if x.strip()]
     m = re.search(rf'^{re.escape(key)}:[ \t]*\n((?:[ \t]+-[ \t]*\S.*\n?)+)', fm, re.M)
     if m: return [x.strip() for x in re.findall(r'^[ \t]+-[ \t]*(.+?)[ \t]*$', m.group(1), re.M) if x.strip()]
